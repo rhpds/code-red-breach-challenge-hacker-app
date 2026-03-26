@@ -23,6 +23,7 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.HeaderParam;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 
 @Path("/")
 public class Hacker {
@@ -58,24 +59,38 @@ public class Hacker {
     @Produces(MediaType.TEXT_PLAIN)
     public String extract(@HeaderParam("x-api-key") String apikey, String data) {
 
- 	if (apikey==null || !apikey.equals(api_key)) {
-        	LOG.info("[USER] denied attempt");
-		return "{ error: 'unauthorized; x-api-key http header is incorrect or missing'}";
-	}
+		if (apikey==null || !apikey.equals(api_key)) {
+				LOG.info("[USER] denied attempt");
+			return "{ error: 'unauthorized; x-api-key http header is incorrect or missing'}";
+		}
 
-        LOG.info("[CTF] printing data via curl: "+data);
-        return "{ info: 'successfully extracted data' ; data: '" + data + "' }";
-    }      
+			LOG.info("[CTF] printing data via curl: "+data);
+			return "{ info: 'successfully extracted data' ; data: '" + data + "' }";
+	}      
     
     @PUT
     @Path("/killswitch")
     @Consumes(MediaType.WILDCARD) 
     @Produces(MediaType.TEXT_PLAIN)
     public String escape(@HeaderParam("x-api-key") String apikey) {
- 	if (apikey!=null && apikey.equals(apikey)) {
-        	LOG.info("[USER] succeeded");
-		return exploit;
-	}
-	return "{ error : 'access denied; x-api-key http header is incorrect or missing' }";
+		if (apikey!=null && apikey.equals(apikey)) {
+				LOG.info("[USER] succeeded");
+			return exploit;
+		}
+		return "{ error : 'access denied; x-api-key http header is incorrect or missing' }";
     }
+
+	@GET
+    @Consumes(MediaType.WILDCARD) 
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response check(@HeaderParam("x-api-key") String apikey) {
+		if (apikey!=null && apikey.equals(apikey)) {
+			//LOG.info("[USER] called / endpoint");
+			return Response.ok("{ endpoint: alive }")
+					.header("ctf-App-Service-Control", "/killswitch")
+					.header("Cache-Control", "no-cache")
+					.build();
+		}
+		return Response.ok("{ error : 'access denied; x-api-key http header is incorrect or missing' }").build();
+	}
 }
