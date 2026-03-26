@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: org.redhat.janus.ExampleResourceTest
+-------------------------------------------------------------------------------
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.028 s - in org.redhat.janus.ExampleResourceTest
